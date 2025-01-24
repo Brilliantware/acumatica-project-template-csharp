@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net4.8</TargetFramework>    
+    <LangVersion>preview</LangVersion>
+    <AssemblyName>MyProject</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>{AcumaticaInstancePath}\Bin\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PX.Common">
+      <HintPath>{AcumaticaInstancePath}\Bin\PX.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="PX.Common.Std">
+      <HintPath>{AcumaticaInstancePath}\Bin\PX.Common.Std.dll</HintPath>
+    </Reference>
+    <Reference Include="PX.Data">
+      <HintPath>{AcumaticaInstancePath}\Bin\PX.Data.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="PX.Data.BQL.Fluent">
+      <HintPath>{AcumaticaInstancePath}\Bin\PX.Data.BQL.Fluent.dll</HintPath>
+    </Reference>
+    <Reference Include="PX.Objects">
+      <HintPath>{AcumaticaInstancePath}\Bin\PX.Objects.dll</HintPath>
+    </Reference>
+    <Reference Include="PX.Web.Customization">
+      <HintPath>{AcumaticaInstancePath}\Bin\PX.Web.Customization.dll</HintPath>
+
+    </Reference>
+    <Compile Remove="_package\**" />
+    <EmbeddedResource Remove="_package\**" />
+    <None Remove="_package\**" />
+  </ItemGroup>
+  <ItemGroup>    
+    <None Remove=".env" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="node $(SolutionDir)px $(ProjectName) -x copy -x build -x upload -x publish --online" />
+  </Target>
+  
+</Project>

@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Brilliant|Ware",
+  "classifications": ["Acumatica", "Customization", "Library"],
+  "name": "Acumatica Customization Project Template",
+  "identity": "Acumatica.Customization.Project.Template.CSharp",
+  "groupIdentity": "AcumaticaCustomizationProjectTemplate",
+  "shortName": "acuprotem",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "MyProject",
+  "preferNameDirectory": true,
+  "symbols": {
+    "AcumaticaInstancePath": {
+      "type": "parameter",
+      "datatype": "string",
+      "replaces": "{AcumaticaInstancePath}"
+    },
+    "AcumaticaBaseUrl": {
+      "type": "parameter",
+      "datatype": "string",
+      "replaces": "{AcumaticaBaseUrl}",
+      "description": "The base URL of the Acumatica ERP instance. needed for publishing --online only",
+      "defaultValue": "http://localhost/instancename"
+    },
+    "AcumaticaUsername": {
+      "type": "parameter",
+      "datatype": "string",
+      "replaces": "{AcumaticaUsername}",
+      "description": "The username to use when logging in to Acumatica ERP. needed for publishing --online only",
+      "defaultValue": "Username"
+    },
+    "AcumaticaPassword": {
+      "type": "parameter",
+      "datatype": "string",
+      "replaces": "{AcumaticaPassword}",
+      "description": "The password to use when logging in to Acumatica ERP. needed for publishing --online only",
+      "defaultValue": "Password"
+    },
+    "AcumaticaCompany": {
+      "type": "parameter",
+      "datatype": "string",
+      "replaces": "{AcumaticaCompany}",
+      "description": "The company name to use when logging in to Acumatica ERP. needed for publishing --online only",
+      "defaultValue": "Company"
+    }
+  }
+}
