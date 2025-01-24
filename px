@@ -14,25 +14,17 @@ const cwd = process.cwd()
 const help =
     `Px.CommandLine.exe wrapper
     Usage: px <projectName> [options]
-    Options:
-    --exec, -x: Execute command, one or many of ['copy', 'build', 'upload', 'publish']
-        it can be used multiple times
+    Options:    
     --init, -i: Initialize package directories and files if needed
+    --copy, -c: Copy files to package source
+    --build, -b: Build project
+    --upload, -u: Upload project    
     --online, -o: Upload project using API
-    copy, -c: Copy files to package source
-    build, -b: Build project
-    upload-offline, -u: Upload project (not working 100%)
-        use -l instead if '-u' doesn't not work
-    upload-online -au: Upload project using API (needs credentias in .env or environment variables)
-        use -l instead of -u if '-u' is not working
-    publish, -p: Publish project
+    --publish, -p: Publish project
 
     --help, -h: Display this help message
     Examples: 
-        px "MyProject" --init --x "copy,build,upload,publish"        
-        px "MyProject" --init -x "copy,build,upload,publish"        
-        px "MyProject" -i -x copy -x build -x upload -x publish
-        px "MyProject" -i -x copy -x build -x upload -x publish --online
+        px "MyProject" [--init] [--copy] [--build] [--upload] [--publish] [--online]
 `
 
 function ifexists(path) { return !path ? null : existsSync(path) ? path : null }
@@ -56,12 +48,15 @@ async function execCmd(cmd) {
 
 try {
 
-    const parsed = parseArgs({
+    const args = parseArgs({
         args: process.args,
         strict: true,
-        options: {
-            x: { type: "string", short: "x", multiple: true },
+        options: {            
             init: { type: "boolean", short: "i" },
+            copy: { type: "boolean", short: "c" },
+            build: { type: "boolean", short: "b" },
+            upload: { type: "boolean", short: "u" },
+            publish: { type: "boolean", short: "p" },
             online: { type: "boolean", short: "o" },
             help: { type: "boolean", short: "h" },
             instancePath: { type: "string" },
@@ -71,36 +66,19 @@ try {
         allowPositionals: true,
         tokens: true
     })
-
-    if (!parsed.values.x && !parsed.values.init) {
+            
+    if (!args.values.build && !args.values.copy && !args.values.upload && !args.values.publish && !args.values.init) {
         console.log(help)
         console.log("Error:\n\tNo command specified")
         process.exit(0)
     }
-    parsed.values.x = parsed.values.x ?? []
-    const args = {
-        ...parsed.values ?? { x: [] },
-        projectName: parsed.positionals[0],
-        exec: {
-            copy: parsed.values.x.indexOf("copy") !== -1,
-            build: parsed.values.x.indexOf("build") !== -1,
-            upload: parsed.values.x.indexOf("upload") !== -1,
-            publish: parsed.values.x.indexOf("publish") !== -1,
-        }
-    }
 
-    if (!(args.exec.build || args.exec.copy || args.exec.upload || args.exec.publish || args.init)) {
-        console.log(help)
-        console.log("Error:\n\tNo known command specified")
-        process.exit(0)
-    }
-
-    if (args.help) {
+    if (args.values.help) {
         console.log(help)
         process.exit(0)
     }
 
-    const projectName = args.projectName ?? findProject()
+    const projectName = args.values.projectName ?? args.positionals[0] ??  findProject()
 
     if (!projectName) throw new Error(`Can't find project '${projectName ?? "?"}'`)
 
@@ -132,10 +110,10 @@ try {
 
     const instancePath = ACUMATICA_INSTANCE_PATH
         ? ifexists(ACUMATICA_INSTANCE_PATH)
-        : ifexists(args.instancePath)
+        : ifexists(args.values.instancePath)
     if (!instancePath) throw new Error("Can't find Acumatica instance path")
 
-    const pxCommandLine = ifexists(args.pxCommandLine)
+    const pxCommandLine = ifexists(args.values.pxCommandLine)
         ?? process.env.PX_COMMAND_LINE ? ifexists(resolve(process.env.PX_COMMAND_LINE)) : null
             ?? ifexists(resolve(__dirname, "Px.CommandLine.exe"))
             ?? !instancePath ? null : resolve(instancePath, "Bin", "Px.CommandLine.exe")
@@ -147,7 +125,7 @@ try {
 
     const packageOutput = resolve(packageSourceRoot, `${projectName}.zip`)
 
-    if (args.init) {
+    if (args.values.init) {
         console.log("Initializing directories and files if needed")
         const packageSource = resolve(projectDir, "_package", projectName)
         mkdirSync(resolve(packageSource, "Bin"), { recursive: true })
@@ -160,11 +138,11 @@ try {
         }
     }
 
-    if (args.exec.copy) {
+    if (args.values.copy) {
         console.log(`Copying '${projectName}' files to package source`)
         const { TARGET_PATH } = process.env
         const targetName = `${projectName}.dll`
-        const targetPath = ifexists(args.targetPath)
+        const targetPath = ifexists(args.values.targetPath)
             ?? ifexists(TARGET_PATH)
             ?? ifexists(resolve(projectDir, "bin", "Debug", "net4.8", targetName))
             ?? ifexists(resolve(projectDir, "bin", "Debug", "net48", targetName))
@@ -176,7 +154,7 @@ try {
         copyFileSync(targetPath, resolve(packageSource, "Bin", targetName))
     }
 
-    if (args.exec.build) {
+    if (args.values.build) {
         console.log("Building (zip) project '%s'", projectName)
         const cmd = `"${pxCommandLine}" /website "${instancePath}" ` +
             `/method BuildProject ` +
@@ -185,7 +163,7 @@ try {
         await execCmd(cmd)
     }
 
-    if (args.exec.upload && !args.online) {
+    if (args.values.upload && !args.values.online) {
 
         console.log("Uploading project '%s' --offline", projectName)
         const cmd = `"${pxCommandLine}" /website "${instancePath}" /method UploadCustomization /path "${packageOutput}" /name "${projectName}" /replace`;
@@ -201,8 +179,8 @@ See the below error message`)
         })
     }
 
-    if (args.exec.upload && args.online) {
-        if (args.uploadOnline) throw new Error("Cannot use both -u and -l at the same time")
+    if (args.values.upload && args.values.online) {
+        if (args.values.uploadOnline) throw new Error("Cannot use both -u and -l at the same time")
 
         const { ACUMATICA_BASE_URL, ACUMATICA_USERNAME, ACUMATICA_PASSWORD, ACUMATICA_COMPANY } = process.env;
         if (!ACUMATICA_BASE_URL || !ACUMATICA_USERNAME || !ACUMATICA_PASSWORD || !ACUMATICA_COMPANY) {
@@ -267,7 +245,7 @@ See the below error message`)
         }
     }
 
-    if (args.exec.publish) {
+    if (args.values.publish) {
         console.log("Publishing project '%s'", projectName)
         const cmd = `"${pxCommandLine}" /website "${instancePath}" /method PublishCustomization /name "${projectName}"`
         await execCmd(cmd)
