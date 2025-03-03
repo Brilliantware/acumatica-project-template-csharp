@@ -1,0 +1,1 @@
+mklink /D Site "{AcumaticaInstancePath}"

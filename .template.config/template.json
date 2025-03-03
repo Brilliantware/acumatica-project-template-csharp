@@ -16,7 +16,8 @@
     "AcumaticaInstancePath": {
       "type": "parameter",
       "datatype": "string",
-      "replaces": "{AcumaticaInstancePath}"
+      "replaces": "{AcumaticaInstancePath}",
+      "isRequired": true
     },
     "AcumaticaBaseUrl": {
       "type": "parameter",
@@ -46,5 +47,23 @@
       "description": "The company name to use when logging in to Acumatica ERP. needed for publishing --online only",
       "defaultValue": "Company"
     }
-  }
+  },
+  "postActions": [
+    {
+      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
+      "args": {
+        "executable": "setup.cmd",
+        "args": "{AcumaticaInstancePath}",
+        "redirectStandardOutput": false,
+        "redirectStandardError": false
+      },
+      "manualInstructions": [
+        {
+          "text": "Run 'setup.cmd'"
+        }
+      ],
+      "continueOnError": false,
+      "description ": "setups the project by calling setup.cmd"
+    }
+  ]
 }

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net4.8</TargetFramework>    
+    <TargetFramework>net4.8</TargetFramework>
     <LangVersion>preview</LangVersion>
     <AssemblyName>MyProject</AssemblyName>
   </PropertyGroup>
@@ -33,12 +33,13 @@
     <EmbeddedResource Remove="_package\**" />
     <None Remove="_package\**" />
   </ItemGroup>
-  <ItemGroup>    
+  <ItemGroup>
     <None Remove=".env" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="node $(SolutionDir)px $(ProjectName) -x copy -x build -x upload -x publish --online" />
+    <Exec
+      Command="&quot;C:\Program Files\Git\usr\bin\bash.exe&quot; --login -i -c &quot;node ../px $(ProjectName) --copy --build --upload --publish --online&quot;" />
   </Target>
-  
+
 </Project>
