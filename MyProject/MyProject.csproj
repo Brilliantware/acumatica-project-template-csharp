@@ -39,7 +39,7 @@
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec
-      Command="&quot;C:\Program Files\Git\usr\bin\bash.exe&quot; --login -i -c &quot;node ../px $(ProjectName) --copy --build --upload --publish --online&quot;" />
+      Command="node ../px $(ProjectName) --icbup --online" />
   </Target>
 
 </Project>
