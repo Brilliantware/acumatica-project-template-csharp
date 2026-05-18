@@ -14,17 +14,21 @@ const cwd = process.cwd()
 const help =
     `Px.CommandLine.exe wrapper
     Usage: px <projectName> [options]
-    Options:    
+    Options:
     --init, -i: Initialize package directories and files if needed
     --copy, -c: Copy files to package source
     --build, -b: Build project
-    --upload, -u: Upload project    
+    --upload, -u: Upload project
     --online, -o: Upload project using API
     --publish, -p: Publish project
+    --name, -n: Override the output package name (folder, zip, and Acumatica project name).
+                Defaults to projectName. Can also be set via PACKAGE_NAME in .env.
+                The .csproj and compiled DLL always use projectName.
 
     --help, -h: Display this help message
-    Examples: 
+    Examples:
         px "MyProject" [--init] [--copy] [--build] [--upload] [--publish] [--online]
+        px "MyProject" --build --upload --publish --name "NewName"
 `
 
 function ifexists(path) { return !path ? null : existsSync(path) ? path : null }
@@ -51,7 +55,7 @@ try {
     const args = parseArgs({
         args: process.args,
         strict: true,
-        options: {            
+        options: {
             init: { type: "boolean", short: "i" },
             copy: { type: "boolean", short: "c" },
             build: { type: "boolean", short: "b" },
@@ -59,6 +63,7 @@ try {
             publish: { type: "boolean", short: "p" },
             online: { type: "boolean", short: "o" },
             help: { type: "boolean", short: "h" },
+            name: { type: "string", short: "n" },
             instancePath: { type: "string" },
             pxCommandLine: { type: "string" },
             targetPath: { type: "string" },
@@ -66,7 +71,7 @@ try {
         allowPositionals: true,
         tokens: true
     })
-            
+
     if (!args.values.build && !args.values.copy && !args.values.upload && !args.values.publish && !args.values.init) {
         console.log(help)
         console.log("Error:\n\tNo command specified")
@@ -106,6 +111,11 @@ try {
         }
     }
 
+    // packageName controls the _package subfolder, zip filename, and Acumatica project name.
+    // Priority: --name CLI arg > PACKAGE_NAME in .env > projectName (default).
+    // The .csproj location and compiled DLL always use projectName.
+    const packageName = args.values.name ?? process.env.PACKAGE_NAME ?? projectName
+
     const { ACUMATICA_INSTANCE_PATH } = process.env
 
     const instancePath = ACUMATICA_INSTANCE_PATH
@@ -121,25 +131,23 @@ try {
 
 
     const packageSourceRoot = resolve(projectDir, "_package")
-    const packageSource = resolve(packageSourceRoot, projectName)
-
-    const packageOutput = resolve(packageSourceRoot, `${projectName}.zip`)
+    const packageSource = resolve(packageSourceRoot, packageName)
+    const packageOutput = resolve(packageSourceRoot, `${packageName}.zip`)
 
     if (args.values.init) {
         console.log("Initializing directories and files if needed")
-        const packageSource = resolve(projectDir, "_package", projectName)
         mkdirSync(resolve(packageSource, "Bin"), { recursive: true })
         const packageProjectDir = resolve(packageSource, "_project")
         mkdirSync(packageProjectDir, { recursive: true })
         const projectMetaFile = resolve(packageProjectDir, "ProjectMetadata.xml")
         if (!existsSync(resolve(projectMetaFile))) {
-            const xml = `<?xml version="1.0" encoding="utf-8"?>\n<project name="${projectName}" level="" description="" />`
+            const xml = `<?xml version="1.0" encoding="utf-8"?>\n<project name="${packageName}" level="" description="" />`
             writeFileSync(projectMetaFile, xml)
         }
     }
 
     if (args.values.copy) {
-        console.log(`Copying '${projectName}' files to package source`)
+        console.log(`Copying '${projectName}.dll' to package source '${packageName}'`)
         const { TARGET_PATH } = process.env
         const targetName = `${projectName}.dll`
         const targetPath = ifexists(args.values.targetPath)
@@ -155,7 +163,7 @@ try {
     }
 
     if (args.values.build) {
-        console.log("Building (zip) project '%s'", projectName)
+        console.log("Building (zip) package '%s'", packageName)
         const cmd = `"${pxCommandLine}" /website "${instancePath}" ` +
             `/method BuildProject ` +
             `/in "${packageSource}" ` +
@@ -165,12 +173,12 @@ try {
 
     if (args.values.upload && !args.values.online) {
 
-        console.log("Uploading project '%s' --offline", projectName)
-        const cmd = `"${pxCommandLine}" /website "${instancePath}" /method UploadCustomization /path "${packageOutput}" /name "${projectName}" /replace`;
+        console.log("Uploading package '%s' --offline", packageName)
+        const cmd = `"${pxCommandLine}" /website "${instancePath}" /method UploadCustomization /path "${packageOutput}" /name "${packageName}" /replace`;
         await execCmd(cmd).catch(err => {
             console.log(`
-WARNING: px.commandline.exe throws errors but it DOES the upload anyway 
-the error is thrown when the project 'exists' 
+WARNING: px.commandline.exe throws errors but it DOES the upload anyway
+the error is thrown when the project 'exists'
 there is no error if the project did not 'exists'
 we have to catch it for the upload to complete
 so we can publish
@@ -220,7 +228,7 @@ See the below error message`)
             }
         }
 
-        console.log("Uploading project '%s' --online", projectName)
+        console.log("Uploading package '%s' --online", packageName)
         const Cookie = await login();
         try {
             const res = await fetch(uploadUrl, {
@@ -232,13 +240,13 @@ See the below error message`)
                 body: JSON.stringify({
                     projectLevel: 0,
                     isReplaceIfExists: true,
-                    projectName,
-                    projectDescription: projectName,
+                    projectName: packageName,
+                    projectDescription: packageName,
                     projectContentBase64: readFileSync(packageOutput).toString("base64")
                 })
             })
             if (!res.ok) {
-                throw new Error(`Error uploading project '${projectName}' using API: ${res.statusText}\n${await res.text()}`)
+                throw new Error(`Error uploading package '${packageName}' using API: ${res.statusText}\n${await res.text()}`)
             }
         } finally {
             await logout(Cookie)
@@ -246,8 +254,8 @@ See the below error message`)
     }
 
     if (args.values.publish) {
-        console.log("Publishing project '%s'", projectName)
-        const cmd = `"${pxCommandLine}" /website "${instancePath}" /method PublishCustomization /name "${projectName}"`
+        console.log("Publishing package '%s'", packageName)
+        const cmd = `"${pxCommandLine}" /website "${instancePath}" /method PublishCustomization /name "${packageName}"`
         await execCmd(cmd)
     }
 
