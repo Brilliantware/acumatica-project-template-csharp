@@ -18,8 +18,7 @@ const help =
     --init, -i: Initialize package directories and files if needed
     --copy, -c: Copy files to package source
     --build, -b: Build project
-    --upload, -u: Upload project
-    --online, -o: Upload project using API
+    --upload, -u: Upload project using API
     --publish, -p: Publish project
     --name, -n: Override the output package name (folder, zip, and Acumatica project name).
                 Defaults to projectName. Can also be set via PACKAGE_NAME in .env.
@@ -27,7 +26,7 @@ const help =
 
     --help, -h: Display this help message
     Examples:
-        px "MyProject" [--init] [--copy] [--build] [--upload] [--publish] [--online]
+        px "MyProject" [--init] [--copy] [--build] [--upload] [--publish]
         px "MyProject" --build --upload --publish --name "NewName"
 `
 
@@ -61,7 +60,6 @@ try {
             build: { type: "boolean", short: "b" },
             upload: { type: "boolean", short: "u" },
             publish: { type: "boolean", short: "p" },
-            online: { type: "boolean", short: "o" },
             help: { type: "boolean", short: "h" },
             name: { type: "string", short: "n" },
             instancePath: { type: "string" },
@@ -171,24 +169,7 @@ try {
         await execCmd(cmd)
     }
 
-    if (args.values.upload && !args.values.online) {
-
-        console.log("Uploading package '%s' --offline", packageName)
-        const cmd = `"${pxCommandLine}" /website "${instancePath}" /method UploadCustomization /path "${packageOutput}" /name "${packageName}" /replace`;
-        await execCmd(cmd).catch(err => {
-            console.log(`
-WARNING: px.commandline.exe throws errors but it DOES the upload anyway
-the error is thrown when the project 'exists'
-there is no error if the project did not 'exists'
-we have to catch it for the upload to complete
-so we can publish
-See the below error message`)
-            console.log(err);
-        })
-    }
-
-    if (args.values.upload && args.values.online) {
-        if (args.values.uploadOnline) throw new Error("Cannot use both -u and -l at the same time")
+    if (args.values.upload) {
 
         const { ACUMATICA_BASE_URL, ACUMATICA_USERNAME, ACUMATICA_PASSWORD, ACUMATICA_COMPANY } = process.env;
         if (!ACUMATICA_BASE_URL || !ACUMATICA_USERNAME || !ACUMATICA_PASSWORD || !ACUMATICA_COMPANY) {
@@ -228,7 +209,7 @@ See the below error message`)
             }
         }
 
-        console.log("Uploading package '%s' --online", packageName)
+        console.log("Uploading package '%s'", packageName)
         const Cookie = await login();
         try {
             const res = await fetch(uploadUrl, {
