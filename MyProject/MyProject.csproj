@@ -39,7 +39,7 @@
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec
-      Command="node ../px $(ProjectName) -icbup --online" />
+      Command="node ../px $(ProjectName) -icbup" />
   </Target>
 
 </Project>
