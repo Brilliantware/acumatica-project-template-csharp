@@ -2,8 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net4.8</TargetFramework>
-    <LangVersion>preview</LangVersion>
-    <AssemblyName>MyProject</AssemblyName>
+    <LangVersion>preview</LangVersion>    
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
