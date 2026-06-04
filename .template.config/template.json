@@ -12,6 +12,13 @@
   },
   "sourceName": "MyProject",
   "preferNameDirectory": true,
+  "sources": [
+    {
+      "exclude": [
+        "dotnet-tools.json"
+      ]
+    }
+  ],
   "symbols": {
     "AcumaticaInstancePath": {
       "type": "parameter",
