@@ -7,26 +7,26 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>{AcumaticaInstancePath}\Bin\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\Site\Bin\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PX.Common">
-      <HintPath>{AcumaticaInstancePath}\Bin\PX.Common.dll</HintPath>
+      <HintPath>..\Site\Bin\PX.Common.dll</HintPath>
     </Reference>
     <Reference Include="PX.Common.Std">
-      <HintPath>{AcumaticaInstancePath}\Bin\PX.Common.Std.dll</HintPath>
+      <HintPath>..\Site\Bin\PX.Common.Std.dll</HintPath>
     </Reference>
     <Reference Include="PX.Data">
-      <HintPath>{AcumaticaInstancePath}\Bin\PX.Data.dll</HintPath>
+      <HintPath>..\Site\Bin\PX.Data.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="PX.Data.BQL.Fluent">
-      <HintPath>{AcumaticaInstancePath}\Bin\PX.Data.BQL.Fluent.dll</HintPath>
+      <HintPath>..\Site\Bin\PX.Data.BQL.Fluent.dll</HintPath>
     </Reference>
     <Reference Include="PX.Objects">
-      <HintPath>{AcumaticaInstancePath}\Bin\PX.Objects.dll</HintPath>
+      <HintPath>..\Site\Bin\PX.Objects.dll</HintPath>
     </Reference>
     <Reference Include="PX.Web.Customization">
-      <HintPath>{AcumaticaInstancePath}\Bin\PX.Web.Customization.dll</HintPath>
+      <HintPath>..\Site\Bin\PX.Web.Customization.dll</HintPath>
 
     </Reference>
     <Compile Remove="_package\**" />
