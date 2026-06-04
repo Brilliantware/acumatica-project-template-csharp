@@ -23,11 +23,7 @@
     </Reference>
     <Reference Include="PX.Objects">
       <HintPath>..\Site\Bin\PX.Objects.dll</HintPath>
-    </Reference>
-    <Reference Include="PX.Web.Customization">
-      <HintPath>..\Site\Bin\PX.Web.Customization.dll</HintPath>
-
-    </Reference>
+    </Reference>    
     <Compile Remove="_package\**" />
     <EmbeddedResource Remove="_package\**" />
     <None Remove="_package\**" />
