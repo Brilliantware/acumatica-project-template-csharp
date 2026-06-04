@@ -4,10 +4,7 @@
     <TargetFramework>net4.8</TargetFramework>
     <LangVersion>preview</LangVersion>    
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\Site\Bin\Newtonsoft.Json.dll</HintPath>
-    </Reference>
+  <ItemGroup>  
     <Reference Include="PX.Common">
       <HintPath>..\Site\Bin\PX.Common.dll</HintPath>
     </Reference>
