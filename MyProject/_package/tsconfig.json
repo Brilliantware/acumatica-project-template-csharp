@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+    "strictPropertyInitialization": false,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
+    "forceConsistentCasingInFileNames": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "target": "es6",
+    "lib": ["es2017", "dom", "DOM.Iterable"],
+    "skipLibCheck": true,
+    "baseUrl": "../../Site/FrontendSources/screen",
+    "paths": {
+      "client-controls": [
+        "node_modules/client-controls"
+      ],
+      "src/*": [
+        "src/*"
+      ]
+    }
+  },
+  "include": [
+    "InventoryItemExt/FrontendSources"
+  ]
+}
