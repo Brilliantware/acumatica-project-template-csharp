@@ -65,6 +65,7 @@ try {
             instancePath: { type: "string" },
             pxCommandLine: { type: "string" },
             targetPath: { type: "string" },
+            projectName: { type: "string" },
         },
         allowPositionals: true,
         tokens: true
