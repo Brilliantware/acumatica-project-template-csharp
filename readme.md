@@ -11,6 +11,8 @@ For a preconfigured '.env' file for './px' when publishing --online
 dotnet new acuprotem -o My.New.Project --AcumaticaInstancePath "c:\Program Files\Acumatica ERP\A242060014" --AcumaticaBaseUrl http://localhost/A242060014 --AcumaticaUsername admin --AcumaticaPassword password --AcumaticaCompany Company
 ```
 
+See [px.md](px.md) for postbuild script details
+
 #### Notes:
 
 <pre><i>Do not check in 'your' '.env'
